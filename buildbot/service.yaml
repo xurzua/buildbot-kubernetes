@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: buildbot
+spec:
+  selector:
+    app: buildbot
+  ports:
+    - port: 8010
+      targetPort: web-port
+      name: web-port
+    - port: 9989
+      targetPort: worker-port
+      name: worker-port

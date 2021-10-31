@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buildbot-worker
+spec:
+  selector:
+    matchLabels:
+      app: buildbot-worker
+  template:
+    metadata:
+      labels:
+        app: buildbot-worker
+    spec:
+      containers:
+        - name: buildbot-worker
+          image: buildbot-worker
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          envFrom:
+            - configMapRef:
+                name: buildbot-worker-config
+            - secretRef:
+                name: buildbot-worker-secret
+          ports:
+            - containerPort: 9989
+              name: worker-port
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /builboot
+              name: tac-file
+      volumes:
+        - name: tac-file
+          configMap:
+            name: buildbot.tac

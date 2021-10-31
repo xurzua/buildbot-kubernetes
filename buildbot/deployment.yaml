@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buildbot
+spec:
+  revisionHistoryLimit: 4
+  replicas: 1
+  selector:
+    matchLabels:
+      app: buildbot
+  template:
+    metadata:
+      labels:
+        app: buildbot
+    spec:
+      containers:
+        - name: buildbot
+          image: buildbot
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8010
+              name: web-port
+              protocol: TCP
+            - containerPort: 9989
+              name: worker-port
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /buildbot
+              name: config
+            - mountPath: /buildbot
+              name: tac-file
+          envFrom:
+            - configMapRef:
+                name: buildbot-master-config
+            - secretRef:
+                name: buildbot-master-secret
+        - name: db
+          image: postgres
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 5432
+              name: db-port
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: buildbot-master-secret
+      volumes:
+        - name: config
+          configMap:
+            name: buildbot-master-master.cfg
+        - name: tac-file
+          configMap:
+            name: buildbot.tac

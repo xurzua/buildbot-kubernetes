@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+components:
+  - "buildbot"
+  - "buildbot-worker"
+namespace: buildbot
+commonLabels:
+  version: latest
+configMapGenerator:
+  - name: buildbot-master-config
+    envs:
+      - "master-config.env"
+  - name: buildbot-master-master.cfg
+    files:
+      - "master.cfg"
+  - name: buildbot-worker-config
+    envs:
+      - "worker-config.env"
+secretGenerator:
+  - name: buildbot-master-secret
+    envs:
+      - "master-secret.env"
+  - name: buildbot-worker-secret
+    envs:
+      - "master-secret.env"
